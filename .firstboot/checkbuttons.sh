@@ -2,6 +2,7 @@
 #
 # Check buttons all work
 #
+echo ":: Waiting for press on all three buttons"
 
 /home/holiday/bin/cliclr 0x004040
 

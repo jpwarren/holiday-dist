@@ -10,21 +10,13 @@
 chmod 666 /dev/mem
 echo ":: Entering Firstboot tests"
 #
+# Stop the buttonapd so we don't fight over the buttons
+#
+/etc/rc.d/buttonappd stop
+#
 # We should reset the AVR here
 #
-# First, we reboot the Arduino
-sudo /home/mpesce/scripts/reduino.sh
-#sleep 2
-#
-#/home/holiday/bin/cliclr 0x000000
-#/home/holiday/bin/cliclr 0x800000
-#sleep 1
-#/home/holiday/bin/cliclr 0x000000
-#/home/holiday/bin/cliclr 0x008000
-#sleep 1
-#/home/holiday/bin/cliclr 0x000000
-#/home/holiday/bin/cliclr 0x000080
-#sleep 2
+sudo /home/holiday/scripts/reduino.sh
 #
 # First things first, bring up the wlan interface
 # And try to join a network that shoud in theory be there to join
@@ -32,40 +24,13 @@ sudo /home/mpesce/scripts/reduino.sh
 echo ":: Joining MooresTest wlan -- will take 10 seconds..."
 wpa_supplicant -B -iwlan0 -c/home/holiday/.firstboot/wpa_firstboot.conf 
 #
-# Have a bit of fun
-#
-/home/holiday/bin/cliclr 0x080808
-sleep 1
-#
-/home/holiday/bin/cliclr 0x101010
-sleep 1
-#
-/home/holiday/bin/cliclr 0x181818
-sleep 1
-#
-/home/holiday/bin/cliclr 0x202020
-sleep 1
-#
-/home/holiday/bin/cliclr 0x282828
-sleep 1
-#
-/home/holiday/bin/cliclr 0x303030
-sleep 1
-#
-/home/holiday/bin/cliclr 0x383838
-sleep 1
-#
-/home/holiday/bin/cliclr 0x404040
-sleep 1
-#
-/home/holiday/bin/cliclr 0x484848
-sleep 1
-#
-/home/holiday/bin/cliclr 0x505050
-sleep 1
+/home/holiday/art/clearall.sh
+/home/holiday/art/cspinner.sh 10 0x001080 0x002080 0x0040a0 0x1080c0 0x003080
 #
 echo ":: Acquiring Address -- will take a few more seconds..."
 dhcpcd wlan0
+/home/holiday/art/clearall.sh
+/home/holiday/art/cspinner.sh 10 0x008020 0x008040 0x008060 0x10c080 0x008050
 #
 # Ok, we should have connectivity, so test it.
 #
