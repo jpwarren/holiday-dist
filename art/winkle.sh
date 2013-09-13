@@ -3,7 +3,7 @@
 # Randomly twinkle, we hope
 #
 secs=$1
-while [ $secs -gt 0 ]
+while [ $secs -gt "0" ]
 do
     twstr=""
     for i in {1..50}
