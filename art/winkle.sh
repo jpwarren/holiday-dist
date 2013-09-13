@@ -15,5 +15,5 @@ do
     #echo "$twstr"
     echo "$twstr" > /run/pipelights.fifo
     secs=$((secs-1))
-    sleep .05
+    env sleep .05
 done
