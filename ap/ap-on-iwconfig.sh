@@ -32,20 +32,17 @@ sleep 1
 # Configure the link
 #
 echo ":: Configuring wlan0"
-#iwconfig wlan0 mode Ad-Hoc
+iwconfig wlan0 mode Ad-Hoc
 #sudo iwconfig wlan0 nickname "Holiday Network"
-#iwconfig wlan0 essid MooresCloud
-#iwconfig wlan0 key off
-#iwconfig wlan0 channel 7
+iwconfig wlan0 essid MooresCloud
+iwconfig wlan0 key off
+iwconfig wlan0 channel 7
 #sudo iwconfig wlan0 commit
 ip addr add 192.168.23.254/24 dev wlan0
 ip route add default via 192.168.23.254
 #
 ip link set up wlan0
 sleep 1
-#
-echo ":: Establishing access point..."
-/home/holiday/bin/hostapd -B /home/holiday/ap/hostapd.conf
 echo ":: Access point configured"
 #
 # Ok, now setup the DHCP server
