@@ -86,3 +86,4 @@ echo $MONOPID>/run/monodns.pid
 #
 echo ":: Access Point established"
 echo $$ > /run/ap-on.pid
+exit 0
