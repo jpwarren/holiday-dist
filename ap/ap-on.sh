@@ -8,6 +8,13 @@
 # DHCP server enabled
 # DNS catcher enabled
 #
+# If the access point is already running, don't do this.
+#
+if [ -e /run/ap-on.pid ]
+then
+    exit 0
+fi
+#
 # Kill off wpa_supplicant
 #
 if [ -e /run/wpa_supplicant.pid ]
@@ -78,4 +85,4 @@ echo $MONOPID>/run/monodns.pid
 /etc/rc.d/avahi-daemon restart
 #
 echo ":: Access Point established"
-
+echo $$ > /run/ap-on.pid

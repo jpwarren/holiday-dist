@@ -5,6 +5,13 @@
 #
 # This is not particularly safe but it is needed.
 #
+# If the access point is on, turn it off
+#
+if [ -e /run/ap-on.pid ]
+then
+    /home/holiday/ap/ap-off.sh
+fi
+#
 echo ":: Starting WPA_Supplicant"
 wpa_supplicant -B -iwlan0 -P/run/wpa_supplicant.pid -c/home/holiday/ap/wpa_supplicant.conf 
 #

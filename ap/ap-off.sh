@@ -2,6 +2,10 @@
 #
 # Turn off the Holiday's WiFi Access Point
 #
+# If the Access point isn't running, don't do this.
+#
+if [ -e /run/ap-on.pid ]
+then
 # Kill off the monomanaical DNS server
 #
 echo ":: Shutting down fake DNS Server"
@@ -51,4 +55,7 @@ ip route del default via 192.168.23.254
 #
 ip link set up wlan0
 sleep 1
+rm /run/ap-on.pid
 echo ":: Access Point stopped"
+fi
+exit 0
