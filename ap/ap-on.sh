@@ -16,12 +16,18 @@ killall wpa_supplicant
 # Kill DHCP Client if running
 #
 echo ":: Shutting down DHCP Client"
-dhcpcd -k 
+if [ -e /run/dhcpcd-wlan0.pid ]
+then
+    dhcpcd -k wlan0
+fi 
 #
 #
 # Kill of DHCP Server if running
 echo ":: DHCP Server shutting down"
-killall dhcpd
+if [ -e /run/dhcpd.pid ]
+then
+    kill `cat /run/dhcpd.pid`
+fi
 #
 # Turn the link off
 #
@@ -45,7 +51,7 @@ ip link set up wlan0
 sleep 1
 #
 echo ":: Establishing access point..."
-/home/holiday/bin/hostapd -B /home/holiday/ap/hostapd.conf
+/home/holiday/bin/hostapd -B -P/run/hostapd.pid /home/holiday/ap/hostapd.conf
 echo ":: Access point configured"
 #
 # Ok, now setup the DHCP server

@@ -11,7 +11,10 @@ killall wpa_supplicant
 # Kill DHCP Client if running
 #
 echo ":: Shutting down DHCP Client"
-dhcpcd -k 
+if [ -e /run/dhcpcd-wlan0 ]
+then
+    dhcpcd -k wlan0
+fi 
 #
 # Turn the link off
 #
