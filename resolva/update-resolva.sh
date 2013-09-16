@@ -35,7 +35,7 @@ echo $JSON2 > /home/holiday/resolva/resolva.json
 #
 # And send it off to the resolva via cURL
 #
-curl -f -X PUT -d @/home/holiday/resolva/resolva.json http://resolva.moorescloud.com/resolva/update
+curl -s -f -X PUT -d @/home/holiday/resolva/resolva.json http://resolva.moorescloud.com/resolva/update
 if [ $? -eq 0 ]
 then
 	echo ":: resolva update succeeded"
