@@ -28,13 +28,13 @@
 #nohup /home/holiday/pipebuttons/pipebuttons >> /dev/null &
 #
 # Next, we reboot the Arduino
-echo ":: Rebooting AVR328Mega"
-sudo /home/holiday/scripts/reduino.sh
-/home/holiday/bin/cliclr 0x000000
-sleep .1
-/home/holiday/bin/cliclr 0xFFFFFF
-sleep .1
-/home/holiday/bin/cliclr 0x000000
+#echo ":: Rebooting AVR328Mega"
+#sudo /home/holiday/scripts/reduino.sh
+#/home/holiday/bin/cliclr 0x000000
+#sleep .1
+#/home/holiday/bin/cliclr 0xFFFFFF
+#sleep .1
+#/home/holiday/bin/cliclr 0x000000
 #
 # 
 # And finally we start up the button process, to do things on button presses
