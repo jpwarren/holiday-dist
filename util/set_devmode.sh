@@ -6,7 +6,7 @@
 NEWSTATE=$1
 echo $NEWSTATE
 #
-if [ $NEWSTATE -eq "True" ]
+if [ "$NEWSTATE" == "True" ]
 then
     # Let's turn the sshd on
     if [ -e /run/sshd.pid ]
