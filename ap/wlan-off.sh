@@ -14,9 +14,9 @@ fi
 #
 # Kill DHCP Client if running
 #
-echo ":: Shutting down DHCP Client"
-if [ -e /run/dhcpcd-wlan0 ]
+if [ -e /run/dhcpcd-wlan0.pid ]
 then
+    echo ":: Shutting down DHCP Client"
     dhcpcd -k wlan0
 fi 
 #
