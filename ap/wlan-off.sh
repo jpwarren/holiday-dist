@@ -5,8 +5,12 @@
 #
 # This is not particularly safe but it is needed.
 #
-echo ":: WPA_Supplicant shutting down"
-killall wpa_supplicant
+if [ -e /run/wpa_supplicant.pid ]
+then
+    echo ":: WPA_Supplicant shutting down"
+    kill `cat /run/wpa_supplicant.pid`
+    rm /run/wpa_supplicant.pid
+fi
 #
 # Kill DHCP Client if running
 #

@@ -29,8 +29,12 @@ fi
 #
 # Kill off wpa_supplicant
 #
-echo ":: WPA_Supplicant shutting down"
-killall wpa_supplicant
+if [ -e /run/wpa_supplicant.pid ]
+then
+    echo ":: WPA_Supplicant shutting down"
+    kill `cat /run/wpa_supplicant.pid`
+    rm /run/wpa_supplicant.pid
+fi
 #
 # Turn the link off
 #

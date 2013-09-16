@@ -6,7 +6,7 @@
 # This is not particularly safe but it is needed.
 #
 echo ":: Starting WPA_Supplicant"
-wpa_supplicant -B -iwlan0 -c/home/holiday/ap/wpa_supplicant.conf 
+wpa_supplicant -B -iwlan0 -P/run/wpa_supplicant.pid -c/home/holiday/ap/wpa_supplicant.conf 
 #
 echo ":: Waiting 10 seconds to join any available wireless network"
 /home/holiday/art/cspinner.sh 10 0x001080 0x002080 0x0040a0 0x1080c0 0x20a0ff
