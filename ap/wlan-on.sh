@@ -16,6 +16,7 @@ echo ":: Starting WPA_Supplicant"
 wpa_supplicant -B -iwlan0 -P/run/wpa_supplicant.pid -c/home/holiday/ap/wpa_supplicant.conf 
 #
 echo ":: Waiting 10 seconds to join any available wireless network"
+/home/holiday/art/clearall.sh
 /home/holiday/art/cspinner.sh 10 0x001080 0x002080 0x0040a0 0x1080c0 0x003080
 # 
 # At this point we could probably test to see if we have a good network
@@ -24,6 +25,7 @@ echo ":: Waiting 10 seconds to join any available wireless network"
 #
 echo ":: Acquiring Address - will take another 10 seconds..."
 dhcpcd wlan0
+/home/holiday/art/clearall.sh
 /home/holiday/art/cspinner.sh 10 0x008020 0x008040 0x008060 0x10c080 0x008050
 #
 # Ok, do we have a gateway? 
