@@ -18,8 +18,8 @@ import sys, subprocess
 
 modelist = [ [ 'colorwheel', [ '/home/holiday/art/cliclr.sh', '0x000000'], False ],
 ['rainbow', ['/home/mpesce/holiday/rainbow &'], True ], 
-[ 'NRL', ['/home/mpesce/sport/nrl', '1'], False ] ,
-[ 'AFL', ['/home/mpesce/sport/afl', '1'], False ], 
+[ 'NRL', ['/home/holiday/bin/nrl', '1'], False ] ,
+[ 'AFL', ['/home/holiday/bin/afl', '1'], False ], 
 [ 'clear', [ '/home/holiday/art/clearall.sh' ], False ] ]
 
 modekill = [ [ 'colorwheel', ['echo'] ], 
