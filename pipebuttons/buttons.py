@@ -17,7 +17,7 @@ __license__ = 'MIT'
 import sys, subprocess
 
 modelist = [ [ 'colorwheel', [ '/home/holiday/art/cliclr.sh', '0x000000'], False ],
-['rainbow', ['/home/mpesce/holiday/rainbow &'], True ], 
+['rainbow', ['/home/holiday/bin/rainbow &'], True ], 
 [ 'NRL', ['/home/holiday/bin/nrl', '1'], False ] ,
 [ 'AFL', ['/home/holiday/bin/afl', '1'], False ], 
 [ 'clear', [ '/home/holiday/art/clearall.sh' ], False ] ]
