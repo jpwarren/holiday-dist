@@ -39,8 +39,8 @@
 # 
 # And finally we start up the button process, to do things on button presses
 #
-echo ":: Starting button process"
-nohup /home/holiday/pipebuttons/buttons.py >> /dev/null &
+#echo ":: Starting button process"
+#nohup /home/holiday/pipebuttons/buttons.py >> /dev/null &
 #
 # And that is all
 #
