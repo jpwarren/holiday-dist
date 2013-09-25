@@ -6,7 +6,7 @@
 #
 # Try to distinguish by exit code.
 #
-pacman -Suypq
+pacman -Syyupq
 RESULT=$?
 echo $RESULT
 if [ $RESULT -eq "1" ] 
