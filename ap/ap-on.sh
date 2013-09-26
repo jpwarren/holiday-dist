@@ -14,6 +14,12 @@ if [ -e /run/ap-on.pid ]
 then
     exit 0
 fi
+# 
+# Start some pretty colours as we go into AP mode so we can tell
+#
+/home/holiday/art/clearall.sh
+/home/holiday/art/cspinner.sh 8 0x800080 0xa00060 0xc00040 0xa00060 0x900070 &
+#
 #
 # Kill off wpa_supplicant
 #
