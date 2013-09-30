@@ -38,7 +38,7 @@ then
 	# And restart avahi-daemon
 	/etc/rc.d/avahi-daemon restart
 	# Update the resolva in the background
-	/home/holiday/resolva/update-resolva.sh &
+	#/home/holiday/resolva/update-resolva.sh &
 	exit 0
 else
 	echo ":: NO WLAN CONNECTIVITY!"

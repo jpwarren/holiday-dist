@@ -13,7 +13,7 @@ echo ":: Entering Firstboot tests"
 # We should reset the AVR here
 #
 # First, we reboot the Arduino
-sudo /home/mpesce/scripts/reduino.sh
+sudo /home/holiday/scripts/reduino.sh
 #sleep 2
 #
 #/home/holiday/bin/cliclr 0x000000
@@ -85,6 +85,9 @@ fi
 # 
 # Now that we've passed the networking tests
 # We need to ship some data over to the label printer.
+#
+# At this point we need to wait for all three buttons to be pushed
+# Apparently in any order we please.  Which is interesting.
 #
 /home/holiday/.firstboot/label.sh
 if [ $? == 0 ]
