@@ -28,10 +28,11 @@ def do_button():
 # Opens the named pipe, and loops, reading things out, 
 # As keystrokes come out of the named pipe, we do stuff. And things.
 
-    global appcounter
+    global appcounter, on
 
     try:
         pb = open("/run/pipebuttons.fifo", "r")
+        print ("Pipe opened")
     except:
         print("Couldn't open the named pipe.")
         sys.exit(-1)
@@ -43,15 +44,22 @@ def do_button():
         
         if cmd == 'M':      # do Mode button press
 
-            applist[appcounter].stop()         # First stop the current mode
-            appcounter += 1                    # Increment the app count
-            if (appcounter == len(applist)):
-                appcounter = 0                 # Wrap counter
-            applist[appcounter].start()         # And start the new mode
+            if (on == False):
+                on = True
+                # just restart the current mode
+                applist[appcounter].start()
+            else:
+
+                applist[appcounter].stop()         # First stop the current mode
+                appcounter += 1                    # Increment the app count
+                if (appcounter == len(applist)):
+                    appcounter = 0                 # Wrap counter
+                applist[appcounter].start()         # And start the new mode
 
         elif cmd == "O":
-            # turn off
-            continue
+            on = False
+            applist[appcounter].stop()      # stop the existing app
+            subprocess.call(['/home/holiday/art/clearall.sh'], shell=False)
 
         elif cmd == "+": # do the plus button
             applist[appcounter].up()
@@ -68,6 +76,8 @@ if __name__ == '__main__':
     # When we start, clear the string
     subprocess.call(['/home/holiday/art/clearall.sh'], shell=False)
     appcounter = 0
+
+    on = True       # The string is on, technically
 
     # Start the first app, if you please
     applist[appcounter].start()
