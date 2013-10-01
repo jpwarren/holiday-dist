@@ -16,7 +16,7 @@ else
 	if [ $? == 0 ]
 	then
 		echo ":: Network up, setting clock..."
-		/root/ntp/ntpset.py &
+		/home/holiday/ntp/ntpset.py >> /dev/null &
 		#/home/holiday/bin/cliclr 0x008000
 	else
 		echo ":: No network detected, estabilshing Access Point"

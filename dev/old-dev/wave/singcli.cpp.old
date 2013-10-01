@@ -1,0 +1,298 @@
+/*
+ * Sing is the Processing-like framework for Holiday procedural animation
+ * After the Processing language by Tom Igoe
+ * 
+ * For the moment, the user procedural file is simply included
+ * And everything is connected together at compile time
+ * 
+ * The user procedural file should define:
+ *
+ * void setup(void*)
+ * void loop(void*)
+ *
+ * And leave everything else to this framework. Hopefully.
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License.
+ *
+ * Cross-compile with cross-gcc -I/path/to/cross-kernel/include
+ */
+
+#include <stdint.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <getopt.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/types.h>
+#ifdef OLIMEX
+#include "gpio-mmap.h"
+#else
+#include <linux/spi/spidev.h>
+#endif
+#include <time.h>
+#include <math.h>
+#include "libfixmath/fixmath.h"
+
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#ifdef OLIMEX
+#define NUM_BULBS 52
+#else
+#define NUM_BULBS 50
+#endif
+#define MAX_LEDS NUM_BULBS
+#define SYNC_TIME 20000000  // microseconds per frame 
+
+static void pabort(const char *s)
+{
+	perror(s);
+	abort();
+}
+
+static const char *device = "/dev/spidev0.0";
+static uint8_t mode;
+static uint8_t bits = 8;
+static uint32_t speed = 1000000;
+static uint16_t delay;
+uint8_t* txbuf;			// Global frame buffer
+int string_size = 0;
+
+long sync_time = 0;
+
+void synchronize(long since) {
+struct timespec ts;
+int retval;
+long curr;
+int waiting = 1;
+
+	// synchronize will exit at least since nanoseconds after the last time sync exited
+	// will try to be as close as possible, given the vagaries of multitasking
+	// The first time through, it will exit immediately as it has not been initialized
+	// So call synchronize(1) during initialization to set things up appropriately
+	//
+	while (1) {
+		retval = clock_gettime(CLOCK_REALTIME, &ts);
+		curr = ts.tv_nsec;
+		if (ts.tv_nsec < sync_time) {		// Handle wraps gracefully
+			curr += 1000000000;
+		}
+		//printf("curr %d sync_time %d diff %d\n", curr, sync_time, curr-sync_time);  
+		if ((curr - sync_time) >= since) {
+			sync_time = ts.tv_nsec;
+			return;
+		} else {
+			usleep(100);		// Sleep for 200 microseconds
+		} 			
+	}
+}
+
+long started = 0;
+
+long since_start(void) {
+struct timespec ts;
+int retval;
+long curr;
+
+	// Return the number of milliseconds since the process began execution
+	// First call returns zero, but initializes values
+	//
+	retval = clock_gettime(CLOCK_REALTIME, &ts);
+	curr = ts.tv_nsec / 1000000;	// Convert to msec
+	curr = (ts.tv_sec * 1000) + curr;
+	if (started == 0) {
+		started = curr;
+		return 0;
+	} 
+	return curr - started;
+} 
+
+/*static void dump_frame(void)
+{
+	int col, row;
+	int ptr = 0;
+	long lv;
+	
+	for (col = 0; col < lamp_cols; col++) {
+		for (row = 0; row < lamp_rows; row++) {
+			lv = txbuf[ptr++] << 16;			// Green
+			lv = lv + (txbuf[ptr++] << 8);		// Red
+			lv = lv + txbuf[ptr];				// Blue
+			printf("%x ", lv);
+		}
+		printf("\n");
+	}
+	printf("\n");
+}*/
+
+static void send_frame(int fd, uint8_t txbuf[], int buffsize)
+{
+#ifdef OLIMEX
+  // GPIO 65 = LED
+  // GPIO 20 = SSP2_MOSI = LED DATA = OL Micro CON2 pin 10 = OL Maxi UEXT pin 8
+  // GPIO 24 = SSP2_SCK = LED CLOCK = OL Micro CON2 pin 11 = OL Maxi UEXT pin 9
+  GPIO_WRITE_PIN(65,1);
+  uint8_t i, j, v, b;
+  for (i=0; i<buffsize; i++) {
+    v = txbuf[i];
+    b = 0x80;
+    for (j=0; j<bits; j++) {
+      GPIO_WRITE_PIN(20,v&b);
+      b >>= 1;
+      GPIO_WRITE_PIN(24,1);
+      GPIO_WRITE_PIN(24,0);
+    }
+  }
+  GPIO_WRITE_PIN(65,0);
+#else
+	int ret;
+	int j  = 0;
+	int offset;
+	uint8_t rx[385] = { 0, };
+	struct spi_ioc_transfer tr;
+		tr.tx_buf = (unsigned long)txbuf;
+		tr.rx_buf = (unsigned long)rx;
+		tr.len = buffsize;
+		tr.delay_usecs = delay;
+		tr.speed_hz = speed;
+		tr.bits_per_word = bits;
+	
+	
+	//printf("buffsize %d\n", buffsize);
+	ret = ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+	if (ret < 1)
+		pabort("can't send spi message");
+#endif
+}
+
+#ifdef OLIMEX
+void set_pixel(int pixnum, uint8_t r, uint8_t g, uint8_t b) {
+	int offset;
+	
+	// Need to check for out-of-bounds here, but meh.
+	//printf("col %d row %d offset %d\n", col, row, (*climap + col)[row]);
+	// Calculate the offset into the buffer
+	offset = pixnum * 3;		// Get the correct offset from the map
+	txbuf[offset] = g | 0x80;
+	txbuf[offset+1] = r | 0x80;
+	txbuf[offset+2] = b | 0x80;
+
+}
+#else
+void set_pixel(int pixnum, uint8_t r, uint8_t g, uint8_t b) {
+	int offset;
+	
+	// Need to check for out-of-bounds here, but meh.
+	//printf("col %d row %d offset %d\n", col, row, (*climap + col)[row]);
+	// Calculate the offset into the buffer
+	offset = pixnum * 3;		// Get the correct offset from the map
+	txbuf[offset] = r;
+	txbuf[offset+1] = g;
+	txbuf[offset+2] = b;
+	//printf("%d %d %x %x %x\n", row, col, r, g, b);
+
+}
+#endif
+
+#include "wave.cpp"
+
+int main(int argc, char *argv[])
+{
+	int ret = 0;
+	int fd, ss, sp, j;
+	int doing = 1;
+	int retuid;
+
+#ifdef OLIMEX
+        retuid = setuid(0);             // root me!
+        if (retuid == -1) {
+                exit(-10);
+        }
+#endif
+
+	since_start();			// initialize the count of when we started execution
+	
+	// Read the size of our LED string
+	// Use the correct map for the string size
+	string_size = ss = NUM_BULBS;
+#ifdef OLIMEX
+	sp = (ss * 3) + 3;		// Add trailing bytes for end-of-string
+#else
+	sp = ss * 3;			// Number of color units in string
+#endif
+
+	// Allocate space for the frame transmit buffer
+	txbuf = (uint8_t*) malloc(sp);
+#ifdef OLIMEX
+	txbuf[sp*3] = 0x00;
+	txbuf[sp*3+1] = 0x00;
+	txbuf[sp*3+2] = 0x00;
+  gpio_map();
+  gpio_output(2,1); //bank 2 bit 1 = GPIO65 the LED on board
+  gpio_output(0,20); //bank 0 bit 20 = GPIO20 = SSP2_MOSI
+  gpio_output(0,24); //bank 0 bit 24 = GPIO24 = SSP2_SCLK
+#else
+
+	fd = open(device, O_RDWR);
+	if (fd < 0)
+		pabort("can't open device");
+
+	/*
+	 * spi mode
+	 */
+	ret = ioctl(fd, SPI_IOC_WR_MODE, &mode);
+	if (ret == -1)
+		pabort("can't set spi mode");
+
+	ret = ioctl(fd, SPI_IOC_RD_MODE, &mode);
+	if (ret == -1)
+		pabort("can't get spi mode");
+
+	/*
+	 * bits per word
+	 */
+	ret = ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
+	if (ret == -1)
+		pabort("can't set bits per word");
+
+	ret = ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
+	if (ret == -1)
+		pabort("can't get bits per word");
+
+	/*
+	 * max speed hz
+	 */
+	ret = ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+	if (ret == -1)
+		pabort("can't set max speed hz");
+
+	ret = ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
+	if (ret == -1)
+		pabort("can't get max speed hz");
+
+	printf("spi mode: %d\n", mode);
+	printf("bits per word: %d\n", bits);
+	printf("max speed: %d Hz (%d KHz)\n", speed, speed/1000);
+#endif
+	// Ok, we're ready to start, so call the setup
+	setup(argc, argv);
+	send_frame(fd, txbuf, sp);		// In this case we want the startup state pushed
+
+	synchronize(1);	// And setup the sync function
+
+	while (doing) {
+		//memset((void*) txbuf, (int) 0x00, (size_t) sp);  // Clear the string quickly
+		if (loop(since_start())) {
+			doing = 0;
+		}
+		//dump_frame();
+		synchronize(SYNC_TIME);					// 50 fps or 20 msec/frame
+		send_frame(fd, txbuf, sp);		// Try to transmit the frame
+	}
+	free(txbuf);		// Always clean up after yourself!
+	
+	close(fd);
+
+	return 0;
+}
