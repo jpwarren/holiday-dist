@@ -14,11 +14,24 @@ echo ":: Entering Firstboot tests"
 #
 /etc/rc.d/buttonappd stop
 #
-# We should reset the AVR here
+# We should send the latest firmware to the AVR here
+# If it fails after 10 repeated tries, we have a problem, Houston.
 #
-sudo /home/holiday/scripts/reduino.sh
+pushd .
+cd /home/holiday/dev/holidayduino
+python holidayduino_update.py
+popd
 #
-# First things first, bring up the wlan interface
+# Before anything else, change the hostname based on the MAC address
+# Set the name of this Holiday
+#
+newname=holiday-`/home/holiday/util/wlan_mac_addr.sh`
+echo ":: Setting hostname to "$newname
+hostname $newname
+echo $newname > /etc/hostname
+sync
+#
+# Next, bring up the wlan interface
 # And try to join a network that shoud in theory be there to join
 #
 echo ":: Joining MooresTest wlan -- will take 10 seconds..."
@@ -65,6 +78,7 @@ if [ $? == 0 ]
 then
 	echo ":: Label transmission successful, exiting firstboot mode."
 	rm /home/holiday/.firstboot/is_firstboot
+	sync	# In case they're too quick on the gun.
 	/home/holiday/bin/cliclr 0x008000
 	exit 0
 else

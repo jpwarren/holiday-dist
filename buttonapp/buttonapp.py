@@ -17,9 +17,17 @@ __license__ = 'MIT'
 
 import sys, subprocess
 import apps.colorwheelapp, apps.rainbowapp, apps.nrlapp, apps.aflapp, apps.clearapp, apps.blinkyapp
+import apps.phlostonapp, apps.twinkleapp
 
-applist = [ apps.clearapp.Clearapp(), apps.colorwheelapp.Colorwheelapp(), 
-apps.rainbowapp.Rainbowapp(), apps.nrlapp.Nrlapp(), apps.aflapp.Aflapp(), apps.blinkyapp.Blinkyapp() ]
+applist = [ apps.clearapp.Clearapp(),
+    apps.twinkleapp.TwinkleApp(),
+    apps.phlostonapp.PhlostonApp(),
+    apps.colorwheelapp.Colorwheelapp(), 
+    apps.rainbowapp.Rainbowapp(),
+    apps.nrlapp.Nrlapp(),
+    apps.aflapp.Aflapp(),
+    apps.blinkyapp.Blinkyapp(),
+    ]
 
 def do_button():
 

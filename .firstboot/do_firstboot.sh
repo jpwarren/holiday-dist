@@ -1,2 +1,4 @@
+sudo hostname holiday
 touch /home/holiday/.firstboot/is_firstboot
-sudo reboot
+sudo shutdown -h now
+
