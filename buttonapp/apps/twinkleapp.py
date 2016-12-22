@@ -17,6 +17,7 @@ import colorsys
 import webcolors
 
 from api.base import ButtonHoliday, ButtonApp
+from registry import appregistry
 
 from simplexnoise import raw_noise_2d
 
@@ -251,6 +252,8 @@ class Twinkler(object):
 
 class TwinkleApp(ButtonApp):
 
+    name = 'twinkle'
+    
     def start(self):
         self.t = TwinkleThread()
         self.modenum = 0
@@ -258,7 +261,8 @@ class TwinkleApp(ButtonApp):
         self.t.start()
 
     def stop(self):
-        self.t.terminate = True
+        if hasattr(self, 't'):
+            self.t.terminate = True
 
     def up(self):
         self.modenum += 1
@@ -306,7 +310,9 @@ class TwinkleThread(threading.Thread):
             pass
         pass
     pass
-    
+
+appregistry.register(TwinkleApp)
+
 if __name__ == '__main__':
     app = TwinkleApp()
     app.start()
@@ -327,3 +333,5 @@ if __name__ == '__main__':
     time.sleep(2)
     
     app.stop()
+
+    print app.t

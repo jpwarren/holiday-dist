@@ -20,6 +20,8 @@ from api.base import ButtonHoliday, ButtonApp
 
 from phloston import PhlostonString
 
+from registry import appregistry
+
 log = logging.getLogger('phloston_app')
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter("%(asctime)s: %(name)s [%(levelname)s]: %(message)s"))
@@ -39,6 +41,8 @@ class PhlostonApp(ButtonApp):
     """
     An app for a physical Holiday
     """
+    name = 'phloston'
+    
     def start(self):
         self.t = PhlostonThread()
         self.t.start()
@@ -111,7 +115,9 @@ class PhlostonThread(threading.Thread):
             return (0,0,0)
         color = self.phloston.pattern[0]
         return color
-        
+
+appregistry.register(PhlostonApp)
+    
 if __name__ == '__main__':
     app = PhlostonApp()
     app.start()

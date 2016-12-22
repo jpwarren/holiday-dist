@@ -3,10 +3,17 @@
 # A very simple app that simply clears the string.
 #
 import subprocess
+
+from api.base import ButtonApp
+from registry import appregistry
+
 maxafl = 18
 curafl = 1
 
-class Aflapp:
+class Aflapp(ButtonApp):
+
+    name = 'aflcolors'
+    
     def __init__(self):
         """Do some initialization here if required"""
         curafl = 1
@@ -47,3 +54,5 @@ class Aflapp:
             subprocess.call(['/home/holiday/bin/afl', '%d' % curafl])
         except:
             print "afl failed"
+
+appregistry.register(Aflapp)

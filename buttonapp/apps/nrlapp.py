@@ -4,10 +4,16 @@
 #
 import subprocess
 
+from api.base import ButtonApp
+from registry import appregistry
+
 maxnrl = 16
 curnrl = 1
 
-class Nrlapp:
+class Nrlapp(ButtonApp):
+
+    name = 'nrlcolors'
+    
     def __init__(self):
         """Do some initialization here if required"""
         curnrl = 1
@@ -49,3 +55,5 @@ class Nrlapp:
         except:
             print "nrl failed"
         return
+
+appregistry.register(Nrlapp)

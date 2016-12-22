@@ -5,11 +5,15 @@
 #
 import subprocess, holidaybuttonapp, time, threading, random
 
-class Blinkyapp:
+from api.base import ButtonApp
+from registry import appregistry
+
+class Blinkyapp(ButtonApp):
+
+    name = 'blinky'
 
     def __init__(self):
         """Do some initialization here if required"""
-        #self.holiday = holidaybuttonapp.Holidaybuttonapp()
         self.freq = 1.0
         return
 
@@ -80,8 +84,8 @@ class Blinkyappthread(threading.Thread):
     def randcv(self):
         """Return a random colour value"""
 
-# ZOMFG LET'S DO SOME TESTING
-#
+appregistry.register(Blinkyapp)
+        
 if __name__ == '__main__':
     app = Blinkyapp()
     app.start()

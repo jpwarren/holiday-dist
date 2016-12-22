@@ -4,11 +4,13 @@
 #
 import subprocess
 
-class Rainbowapp:
-    def __init__(self):
-        """Do some initialization here if required"""
-        return
+from api.base import ButtonApp
+from registry import appregistry
 
+class Rainbowapp(ButtonApp):
+
+    name = 'rainbow'
+    
     def start(self):
         """Do whatever is needed to invoke the app"""
         try:
@@ -25,10 +27,4 @@ class Rainbowapp:
             print "termination of rainbow failed"
         return
 
-    def up(self):
-        """Process a press of the up button"""
-        return
-
-    def down(self):
-        """Process a press of the down button"""
-        return
+appregistry.register(Rainbowapp)

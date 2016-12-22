@@ -128,8 +128,18 @@ class ButtonHoliday(HolidayBase):
 class ButtonApp(object):
     """
     A ButtonApp runs on a physical Holiday using the button interface.
-    """
 
+    Set an app name to refer to this buttonapp.
+
+    The name should be unique on each Holiday so it
+    can be used to uniquely refer to that app running
+    on the Holiday.
+    A globally unique name would allow the same app name
+    to be used on a set of Holidays.
+    """
+    
+    name = 'buttonapp'
+    
     def start(self):
         """
         Do whatever is required to start up the app

@@ -4,10 +4,12 @@
 #
 import subprocess
 
-class Clearapp:
-    def __init__(self):
-        """Do some initialization here if required"""
-        return
+from api.base import ButtonApp
+from registry import appregistry
+
+class Clearapp(ButtonApp):
+
+    name = 'clear'
 
     def start(self):
         """Do whatever is needed to invoke the app"""
@@ -17,14 +19,4 @@ class Clearapp:
             print "clearall.sh failed"
         return
 
-    def stop(self):
-        """Stop execution of the app"""
-        return
-
-    def up(self):
-        """Process a press of the up button"""
-        return
-
-    def down(self):
-        """Process a press of the down button"""
-        return
+appregistry.register(Clearapp)

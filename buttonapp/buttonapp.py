@@ -12,30 +12,24 @@ License: MIT (see LICENSE for details)
 """
 
 __author__ = 'Mark Pesce'
-__version__ = '0.01-dev'
+__version__ = '1.1b1'
 __license__ = 'MIT'
 
 import sys, subprocess
-import apps.colorwheelapp, apps.rainbowapp, apps.nrlapp, apps.aflapp, apps.clearapp, apps.blinkyapp
-import apps.phlostonapp, apps.twinkleapp
+from collections import OrderedDict
 
-applist = [ apps.clearapp.Clearapp(),
-    apps.twinkleapp.TwinkleApp(),
-    apps.phlostonapp.PhlostonApp(),
-    apps.colorwheelapp.Colorwheelapp(), 
-    apps.rainbowapp.Rainbowapp(),
-    apps.nrlapp.Nrlapp(),
-    apps.aflapp.Aflapp(),
-    apps.blinkyapp.Blinkyapp(),
-    ]
+from apps.api.base import ButtonApp
+from apps.registry import appregistry
 
+applist = appregistry.values()
+        
 def do_button():
+    """
+    Handle the button presses.
 
-# Handle the button presses.
-# Opens the named pipe, and loops, reading things out, 
-# As keystrokes come out of the named pipe, we do stuff. And things.
-
-    global appcounter, on
+    Opens the named pipe, and loops, reading things out, 
+    As keystrokes come out of the named pipe, we do stuff. And things.
+    """
 
     try:
         pb = open("/run/pipebuttons.fifo", "r")
@@ -44,50 +38,69 @@ def do_button():
         print("Couldn't open the named pipe.")
         sys.exit(-1)
 
+    # We are on
+    on = True
+    
+    # Start an app when we begin.
+    appidx = 0
+    currentapp = applist[appidx]
+    currentapp.start()
+        
     # The readline call is going to block.  We're ok with that, for now.
     while (True):
         rl = pb.readline()
         cmd  = rl[0:1]      # Get the command
-        
         if cmd == 'M':      # do Mode button press
 
             if (on == False):
                 on = True
                 # just restart the current mode
-                applist[appcounter].start()
+                currentapp.start()
             else:
+                currentapp.stop() 
+                appidx += 1       
+                # Wrap counter
+                if (appidx == len(applist)):
+                    appidx = 0
 
-                applist[appcounter].stop()         # First stop the current mode
-                appcounter += 1                    # Increment the app count
-                if (appcounter == len(applist)):
-                    appcounter = 0                 # Wrap counter
-                applist[appcounter].start()         # And start the new mode
+                currentapp = applist[appidx]
+                currentapp.start()
 
         elif cmd == "O":
             on = False
-            applist[appcounter].stop()      # stop the existing app
-            subprocess.call(['/home/holiday/art/clearall.sh'], shell=False)
+            currentapp.stop()      # stop the existing app
+            try:
+                subprocess.call(['/home/holiday/art/clearall.sh'], shell=False)
+            except OSError, e:
+                print "Can't call clearall", e
 
         elif cmd == "+": # do the plus button
-            applist[appcounter].up()
+            currentapp.up()
 
         elif cmd == "-":  # do the minus button
-            applist[appcounter].down()
+            currentapp.down()
+
+        elif cmd == "R":  # Run a specific app
+            print "Running an app"
+            appname = rl[1:].rstrip()
+            try:
+                newapp = appregistry[appname]
+                currentapp.stop()
+                currentapp = newapp
+                currentapp.start()
+            except KeyError:
+                print "No such app: %s" % appname
 
         else:
-            print("This should never happen")
-
+            #print("This should never happen")
+            pass
 
 if __name__ == '__main__':
 
     # When we start, clear the string
-    subprocess.call(['/home/holiday/art/clearall.sh'], shell=False)
-    appcounter = 0
+    try:
+        subprocess.call(['/home/holiday/art/clearall.sh'], shell=False)
+    except OSError, e:
+        print "Can't call clearall", e
 
-    on = True       # The string is on, technically
-
-    # Start the first app, if you please
-    applist[appcounter].start()
-
-    # And now read the button input....
     do_button()

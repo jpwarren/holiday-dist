@@ -4,6 +4,9 @@
 #
 import subprocess
 
+from api.base import ButtonApp
+from registry import appregistry
+
 wheel_colors = [ [ 0xFF, 0x00, 0x00 ],  
 [ 0xEF, 0x0F, 0x00 ],   
 [ 0xDF, 0x1F, 0x00 ],
@@ -57,7 +60,9 @@ wheel_colors = [ [ 0xFF, 0x00, 0x00 ],
 
 wheel_index = 0
 
-class Colorwheelapp:
+class Colorwheelapp(ButtonApp):
+
+    name = 'colorwheel'
 
     def __init__(self):
         """Do some initialization here if required"""
@@ -104,3 +109,5 @@ class Colorwheelapp:
         except:
             print "cliclr.sh failed"
         return
+
+appregistry.register(Colorwheelapp)
