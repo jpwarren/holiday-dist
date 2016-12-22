@@ -42,11 +42,11 @@ MODES = [
 
     # Xmas twinkle
     {'twinkle_algo': 'simplex',
-     'simplex_damper': 4.0,
+     'simplex_damper': 3.0,
      'init_pattern': load_patternfile(os.path.join(PATTERN_DIR, 'xmas4.json')),
      'chase': None,
      'snoozetime': 0.04,
-     'adjust_hsv': (0.0, 0.0, -0.2),
+     'adjust_hsv': (0.0, 0.0, -0.3),
      },
 
     # Xmas chase
