@@ -44,6 +44,7 @@ def do_button():
     # Start an app when we begin.
     appidx = 0
     currentapp = applist[appidx]
+    print("Start with app: %s" % currentapp.name)
     currentapp.start()
         
     # The readline call is going to block.  We're ok with that, for now.

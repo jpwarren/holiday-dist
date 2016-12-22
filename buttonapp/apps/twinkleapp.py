@@ -35,6 +35,7 @@ MODES = [
     {'twinkle_algo': 'simplex',
      'simplex_damper': 4.0,
      'init_pattern': [(176, 119, 31),] * ButtonHoliday.NUM_GLOBES,
+     'adjust_hsv': (0.0, 0.0, -0.5),
      'chase': None,
      'snoozetime': 0.04,
      },
@@ -42,14 +43,30 @@ MODES = [
     # Xmas twinkle
     {'twinkle_algo': 'simplex',
      'simplex_damper': 4.0,
-     'init_pattern': load_patternfile(os.path.join(PATTERN_DIR, 'xmas.json')),
+     'init_pattern': load_patternfile(os.path.join(PATTERN_DIR, 'xmas4.json')),
      'chase': None,
      'snoozetime': 0.04,
+     'adjust_hsv': (0.0, 0.0, -0.2),
      },
 
     # Xmas chase
     {'twinkle_algo': 'chase_only',
-     'init_pattern': load_patternfile(os.path.join(PATTERN_DIR, 'xmas2.json')),
+     'init_pattern': load_patternfile(os.path.join(PATTERN_DIR, 'xmas4.json')),
+     'chase': True,
+     'snoozetime': 0.5,
+     },
+
+    # Xmas twinkle
+    {'twinkle_algo': 'simplex',
+     'simplex_damper': 4.0,
+     'init_pattern': load_patternfile(os.path.join(PATTERN_DIR, 'xmas3.json')),
+     'chase': None,
+     'snoozetime': 0.04,
+     },
+    
+    # Xmas chase
+    {'twinkle_algo': 'chase_only',
+     'init_pattern': load_patternfile(os.path.join(PATTERN_DIR, 'xmas3.json')),
      'chase': True,
      'snoozetime': 0.5,
      },
@@ -117,6 +134,12 @@ class Twinkler(object):
         self.hol.set_pattern(pattern)
         pass
 
+    def adjust_pattern_brightness(self, pattern):
+        """
+        Sometimes we need to adjust the pattern brightness
+        for twinkle mode.
+        """
+
     def render(self):
         self.hol.render()
 
@@ -131,14 +154,36 @@ class Twinkler(object):
             self.noise_array[idx] = -1.0
             pass
 
-        ranger = (self.noise_array[idx] + 1.0) / 2.0
+        ranger = (self.noise_array[idx] + 1.0) / 1.0
 
         # Adjust colour. 
         (base_r, base_g, base_b) = self.options['init_pattern'][idx]
-        #log.debug("adjusting from orig: %d %d %d", base_r, base_g, base_b)
+        
+        # Tweak the value of the colour for twinkling purposes
+        adj_hsv = self.options.get('adjust_hsv', None)
+        if adj_hsv is not None:
+            (h, s, v) = colorsys.rgb_to_hsv(base_r/255.0, base_g/255.0, base_b/255.0)
+            h = h + adj_hsv[0]
+            s = s + adj_hsv[1]
+            v = v + adj_hsv[2]
+            (rn, gn, bn) = colorsys.hsv_to_rgb(h, s, v)
+            base_r = 255 * rn
+            base_g = 255 * gn
+            base_b = 255 * bn
+
+        #print "pre:", base_r, base_g, base_b
         r = int(base_r * ranger)
         g = int(base_g * ranger)
         b = int(base_b * ranger)
+        #print "post:", r, g, b
+        
+        if r > 255:
+            r = 255
+        if g > 255:
+            g = 255
+        if b > 255:
+            g = 255
+
         self.hol.setglobe(idx, r, g, b)
         pass
 
